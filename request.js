@@ -751,7 +751,7 @@ Request.prototype.start = function () {
 
   let savedHeaders;
   if (self.headerOrder) {
-    savedHeaders = reqOptions.headers;
+    savedHeaders = Object.assign({}, reqOptions.headers);
     reqOptions.headers = {};
   }
 
