@@ -749,8 +749,9 @@ Request.prototype.start = function () {
   // consistency with node versions before v6.8.0
   delete reqOptions.timeout
 
+  let savedHeaders;
   if (self.headerOrder) {
-    let savedHeaders = reqOptions.headers;
+    savedHeaders = reqOptions.headers;
     reqOptions.headers = {};
   }
 
