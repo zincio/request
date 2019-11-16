@@ -156,6 +156,8 @@ Request.prototype.init = function (options) {
     }
   }
 
+  self.headerOrder = options.headerOrder
+
   caseless.httpify(self, self.headers)
 
   if (!self.method) {
@@ -747,11 +749,29 @@ Request.prototype.start = function () {
   // consistency with node versions before v6.8.0
   delete reqOptions.timeout
 
+  if (self.headerOrder) {
+    let savedHeaders = reqOptions.headers;
+    reqOptions.headers = {};
+  }
+
   try {
     self.req = self.httpModule.request(reqOptions)
   } catch (err) {
     self.emit('error', err)
     return
+  }
+
+  // Reorder the headers based on self.headerOrder (list of headers & canonical casing for them)
+  if (self.headerOrder) {
+    self.headerOrder.forEach((h)=>{
+      if (self.hasHeader(h)) {
+        self.req.setHeader(h, self.getHeader(h))
+        self.removeHeader(h)
+      }
+    })
+    Object.keys(self.headers).forEach((h)=>{
+      self.req.setHeader(h, self.getHeader(h))
+    })
   }
 
   if (self.timing) {
