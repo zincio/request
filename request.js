@@ -761,16 +761,17 @@ Request.prototype.start = function () {
     return
   }
 
-  // Reorder the headers based on self.headerOrder (list of headers & canonical casing for them)
+  // Reorder the headers based on self.headerOrder
+  // Any headers not in that list are sent at end in random order
   if (self.headerOrder) {
     self.headerOrder.forEach((h)=>{
       if (self.hasHeader(h)) {
         self.req.setHeader(h, self.getHeader(h))
-        self.removeHeader(h)
+        delete savedHeaders[self.hasHeader(h)]  // hasHeader returns name of header with matching case
       }
     })
-    Object.keys(self.headers).forEach((h)=>{
-      self.req.setHeader(h, self.getHeader(h))
+    Object.keys(savedHeaders).forEach((h)=>{
+      self.req.setHeader(h, savedHeaders[h])
     })
   }
 
